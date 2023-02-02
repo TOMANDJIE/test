@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>放大镜效果</title>
+    <style>
+        .box {
+            position: relative;
+        }
+        .boss {
+            width: 400px;
+            height: 400px;
+            margin-right: 30px;
+            border: 1px solid black;
+            overflow: hidden;
+            position: relative;
+        }
+        .boss>img {
+            width: 400px;
+            height: 400px;
+        }
+        .shadow {
+            width: 150px;
+            height: 150px;
+            background-color: orange;
+            opacity: 0.5;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+        }
+        .enlarge {
+            width: 400px;
+            height: 400px;
+            border: 1px solid black;
+            overflow: hidden;
+            position: absolute;
+            top: 0;
+            left: 420px;
+            display: none;
+        }
+        .enlarge>img {
+            width: 910px;
+            height: 910px;
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        /* 切换图片 */
+        nav {
+            list-style: none;
+            margin-top: 20px;
+            justify-content: space-between;
+        }
+        nav>li {
+            width: 50px;
+            height: 50px;
+            float: left;
+            margin-right: 20px;
+            background-size: 50px 50px;
+            border: 1px solid black;
+        }
+        .img1 {
+            background-image: url(img/banner1.png);
+        }
+        .img2 {
+            background-image: url(img/banner2.jpg);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <div class="boss">
+            <img src="img/banner1.png">
+            <img src="img/banner2.jpg">
+            <!-- 阴影 -->
+            <div class="shadow"></div>
+        </div>
+        <!-- 放大效果盒子 -->
+        <div class="enlarge">
+            <img src="img/banner1.png" style="display: block;">
+            <img src="img/banner2.jpg" alt="">
+        </div>
+    </div>
+
+    <!-- 切换图片 -->
+    <nav>
+        <li class="img1"></li>
+        <li class="img2"></li>
+    </nav>
+</body>
+<script>
+    var navDom = document.querySelectorAll('nav > li');
+    var imgDom = document.querySelectorAll('.boss > img');
+    var bossDom = document.querySelector('.boss');
+    // 阴影
+    var shadowDom = document.querySelector('.shadow');
+    // 放大区
+    var enlargeDom = document.querySelector('.enlarge');
+    var enImgDom = document.querySelectorAll('.enlarge > img');
+    var index;
+    // 图片切换
+    navDom.forEach(function (dom, index) {
+        dom.setAttribute('data-index', index)
+        //点击事件
+        dom.onclick = function () {
+            imgDom.forEach(function (dom) {
+                dom.style.display = 'none';
+            })
+            enImgDom.forEach(function(dom) {
+                dom.style.display = 'none'
+            })
+            var index = this.getAttribute('data-index');
+            imgDom[index].style.display = 'block';
+            enImgDom[index].style.display = 'block';
+        }
+    })
+    //鼠标移入
+    bossDom.onmouseover = function() {
+        console.log('进入');
+        shadowDom.style.display = 'block';
+        enlargeDom.style.display = 'block';
+    }
+
+    //鼠标移动
+    bossDom.onmousemove = function(e) {
+        console.log('移动');
+        //盒子位置
+        /**
+         * e.clientX ：鼠标当前位置
+         * offsetLeft：获取盒子左边局浏览器多远
+         * offsetWidth：获取盒子宽度
+        */
+        var x = e.clientX - bossDom.offsetLeft - shadowDom.offsetWidth / 2;
+        var y = e.clientY - bossDom.offsetTop - shadowDom.offsetHeight / 2;
+
+        //位置限定
+        if(x < 0) {
+            x = 0;
+        }else if( x > (bossDom.offsetWidth - shadowDom.offsetWidth)) {
+            x = bossDom.offsetWidth - shadowDom.offsetWidth;
+        }
+
+        if( y < 0) {
+            y = 0;
+        }else if(y > (bossDom.offsetHeight - shadowDom.offsetHeight)) {
+            y = bossDom.offsetHeight - shadowDom.offsetHeight;
+        }
+
+        //阴影移动
+        shadowDom.style.left = x + 'px';
+        shadowDom.style.top = y + 'px';
+
+        //放大图片移动
+        enImgDom.forEach(function(dom) {
+            var dis = dom.style.display;
+            if(dis == 'block') {
+                dom.style.left = -x * 2 + 'px';
+                dom.style.top = -y * 2 + 'px';
+            } 
+        })
+    }
+
+    // 鼠标移出
+    bossDom.onmouseout = function() {
+        console.log('移出');
+        shadowDom.style.display = 'none';
+        enlargeDom.style.display = 'none';
+    }
+</script>
+
+</html>
